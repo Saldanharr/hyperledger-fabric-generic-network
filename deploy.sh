@@ -60,12 +60,12 @@ sudo chmod -R 777 ./crypto-config
 #for ORDERER_NUMBER in 1 2 3
 #do
   ORDERER_DIRECTORY=./crypto-config/ordererOrganizations/orderers
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/signcerts/cert.pem $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/server.crt
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/keystore/*_sk $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/server.key
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/tlscacerts/*.pem $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
+  sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/signcerts/cert.pem $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/server.crt
+  sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/keystore/*_sk $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/server.key
+  sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/tlscacerts/*.pem $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
   
   # Delete empty directories
-  sudo rm -rf $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/{cacerts,keystore,signcerts,tlscacerts,user}
+  sudo rm -rf $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/{cacerts,keystore,signcerts,tlscacerts,user}
 #done
 
 # Peers crypto-config directory
