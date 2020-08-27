@@ -146,7 +146,7 @@ services:
     networks:
       - fabric
 
-  orderer2:
+  
     container_name: orderer2.${DOMAIN_OF_ORGANIZATION}
     image: hyperledger/fabric-orderer
     environment:
@@ -179,7 +179,7 @@ services:
     networks:
       - fabric
 
-  orderer3:
+  
     container_name: orderer3.${DOMAIN_OF_ORGANIZATION}
     image: hyperledger/fabric-orderer
     environment:

@@ -75,22 +75,22 @@ Orderer: &OrdererDefaults
   OrdererType: etcdraft
   Addresses:
     - ip_address:7050
-    - ip_address:8050
-    - ip_address:9050
+    #- ip_address:8050
+    #- ip_address:9050
   EtcdRaft:
     Consenters:
       - Host: ip_address
         Port: 7050
         ClientTLSCert: crypto-config/ordererOrganizations/orderers/orderer1.organization_domain/tls/server.crt
         ServerTLSCert: crypto-config/ordererOrganizations/orderers/orderer1.organization_domain/tls/server.crt
-      - Host: ip_address
-        Port: 8050
-        ClientTLSCert: crypto-config/ordererOrganizations/orderers/orderer2.organization_domain/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/orderers/orderer2.organization_domain/tls/server.crt
-      - Host: ip_address
-        Port: 9050
-        ClientTLSCert: crypto-config/ordererOrganizations/orderers/orderer3.organization_domain/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/orderers/orderer3.organization_domain/tls/server.crt
+      #- Host: ip_address
+      #  Port: 8050
+      #  ClientTLSCert: crypto-config/ordererOrganizations/orderers/orderer2.organization_domain/tls/server.crt
+      #  ServerTLSCert: crypto-config/ordererOrganizations/orderers/orderer2.organization_domain/tls/server.crt
+      #- Host: ip_address
+      #  Port: 9050
+      #  ClientTLSCert: crypto-config/ordererOrganizations/orderers/orderer3.organization_domain/tls/server.crt
+      #  ServerTLSCert: crypto-config/ordererOrganizations/orderers/orderer3.organization_domain/tls/server.crt
 
   BatchTimeout: 2s
 
