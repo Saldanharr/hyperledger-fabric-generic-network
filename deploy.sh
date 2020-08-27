@@ -43,6 +43,7 @@ sed -e 's/organization_name/'$NAME_OF_ORGANIZATION'/g' -e 's/organization_domain
 docker-compose -p fabric-network -f docker-compose.yml up -d ca
 sleep 3
 
+
 # Generate identity and cryptographic materials for the 3 orderers 
 #for ORDERER_NUMBER in 1 2 3
 #do
