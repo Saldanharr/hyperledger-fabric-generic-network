@@ -55,6 +55,8 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/peer/peers/peer.${DOMAIN_OF_ORGANIZATION}/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/peer/peers/peer.${DOMAIN_OF_ORGANIZATION}/tls/server.key
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/peer/peers/peer.${DOMAIN_OF_ORGANIZATION}/tls/ca.crt
+      - CORE_PEER_CHAINCODEADDRESS=peer.${DOMAIN_OF_ORGANIZATION}:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052 
     working_dir: /etc/hyperledger/peer
     command: peer node start
     ports:
