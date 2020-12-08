@@ -43,11 +43,8 @@ sed -e 's/organization_name/'$NAME_OF_ORGANIZATION'/g' -e 's/organization_domain
 docker-compose -p fabric-network -f docker-compose.yml up -d ca
 sleep 3
 
-# Generate identity and cryptographic materials for the 3 orderers 
-for ORDERER_NUMBER in 1 2 3
-do
-  docker exec ca.$DOMAIN_OF_ORGANIZATION /bin/bash -c "cd /etc/hyperledger/artifacts/  && ./orderer-identity.sh $CA_ADDRESS_PORT $DOMAIN_OF_ORGANIZATION $HOST_COMPUTER_IP_ADDRESS $CA_ADMIN_USER $CA_ADMIN_PASSWORD $ORDERER_NUMBER $ORDERER_PASSWORD"
-done
+docker exec ca.$DOMAIN_OF_ORGANIZATION /bin/bash -c "cd /etc/hyperledger/artifacts/  && ./orderer-identity.sh $CA_ADDRESS_PORT $DOMAIN_OF_ORGANIZATION $HOST_COMPUTER_IP_ADDRESS $CA_ADMIN_USER $CA_ADMIN_PASSWORD $ORDERER_PASSWORD"
+
 
 # Generate identity and cryptographic materials for the peer 
 docker exec ca.$DOMAIN_OF_ORGANIZATION /bin/bash -c "cd /etc/hyperledger/artifacts/  && ./peer-identity.sh $CA_ADDRESS_PORT $DOMAIN_OF_ORGANIZATION $HOST_COMPUTER_IP_ADDRESS $PEER_PASSWORD"
@@ -57,16 +54,14 @@ sudo mv ./${ORGANIZATION_NAME_LOWERCASE}Ca/client/crypto-config ./
 sudo chmod -R 777 ./crypto-config
 
 # Move TLS certificates for the 3 orderers 
-for ORDERER_NUMBER in 1 2 3
-do
-  ORDERER_DIRECTORY=./crypto-config/ordererOrganizations/orderers
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/signcerts/cert.pem $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/server.crt
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/keystore/*_sk $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/server.key
-  sudo mv $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/tlscacerts/*.pem $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
-  
-  # Delete empty directories
-  sudo rm -rf $ORDERER_DIRECTORY/orderer$ORDERER_NUMBER.$DOMAIN_OF_ORGANIZATION/tls/{cacerts,keystore,signcerts,tlscacerts,user}
-done
+
+ORDERER_DIRECTORY=./crypto-config/ordererOrganizations/orderers
+sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/signcerts/cert.pem $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/server.crt
+sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/keystore/*_sk $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/server.key
+sudo mv $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/tlscacerts/*.pem $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
+
+# Delete empty directories
+sudo rm -rf $ORDERER_DIRECTORY/orderer.$DOMAIN_OF_ORGANIZATION/tls/{cacerts,keystore,signcerts,tlscacerts,user}
 
 # Peers crypto-config directory
 PEER_DIRECTORY=./crypto-config/peerOrganizations/peers/peer.$DOMAIN_OF_ORGANIZATION
@@ -79,45 +74,5 @@ sudo mv $PEER_DIRECTORY/tls/tlscacerts/*.pem $PEER_DIRECTORY/tls/ca.crt
 # Delete the peers empty directory
 sudo rm -rf $PEER_DIRECTORY/tls/{cacerts,keystore,signcerts,tlscacerts,user}
 
-# Generate the channel configuration 
-./generate.sh ${ORGANIZATION_NAME_LOWERCASE}channel $NAME_OF_ORGANIZATION
-sleep 2
-
 # Start the network with docker-compose
-docker-compose -f docker-compose.yml up -d peer couchdb cli 
-sleep 2
-docker-compose -f docker-compose.yml up -d orderer
-docker-compose -f docker-compose.yml up -d orderer2 
-docker-compose -f docker-compose.yml up -d orderer3
-sleep 15
-
-# Creates the channel
-docker exec cli peer channel create -o orderer1.$DOMAIN_OF_ORGANIZATION:7050 -c ${ORGANIZATION_NAME_LOWERCASE}channel --tls --cafile /etc/hyperledger/crypto-config/ordererOrganizations/orderers/orderer1.$DOMAIN_OF_ORGANIZATION/tls/ca.crt -f /etc/hyperledger/artifacts/channel.tx
-
-# Joins the peer to the channel
-docker exec cli peer channel join -b ${ORGANIZATION_NAME_LOWERCASE}channel.block
-
-# Build javescript chaincode
-pushd chaincode
-npm install
-npm run build
-popd 
-
-# Install the chaincode
-docker exec cli peer chaincode install -n chaincode -v 1.0 -p /etc/hyperledger/chaincode -l node
-
-# Instantiate the chaincode
-docker exec cli peer chaincode instantiate -o orderer1.$DOMAIN_OF_ORGANIZATION:7050 -C ${ORGANIZATION_NAME_LOWERCASE}channel -n chaincode -v 1.0 -l node -c '{"Args":["initLedger"]}' -P "OR('${NAME_OF_ORGANIZATION}MSP.member')" --tls --cafile /etc/hyperledger/crypto-config/ordererOrganizations/orderers/orderer1.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
-
-sleep 5
-
-# Test the chaincode
-# Invoke a transaction
-docker exec cli peer chaincode invoke -o orderer1.$DOMAIN_OF_ORGANIZATION:7050 -C ${ORGANIZATION_NAME_LOWERCASE}channel -n chaincode -c '{"Args":["invokeTransaction","1","{anythingHereAsJsonPayload}"]}' --tls --cafile /etc/hyperledger/crypto-config/ordererOrganizations/orderers/orderer1.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
-
-sleep 3
-
-# Query the blockchain
-docker exec cli peer chaincode query -C ${ORGANIZATION_NAME_LOWERCASE}channel -n chaincode -c '{"Args":["queryBlockchain","1"]}' --tls --cafile /etc/hyperledger/crypto-config/ordererOrganizations/orderers/orderer1.$DOMAIN_OF_ORGANIZATION/tls/ca.crt
-
-# NETWORK DEPLOYMENT COMPLETED SUCCESSFULLY
+docker-compose -f docker-compose.yml up -d peer couchdb cli orderer

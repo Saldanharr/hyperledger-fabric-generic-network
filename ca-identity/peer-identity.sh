@@ -5,7 +5,6 @@ COMPANY_DOMAIN=$2
 IP_ADDRESS=$3
 PEER_PASSWORD=$4
 
-
 # Peer directory to save the peers cryptographic materials
 PEER_DIRECTORY=/etc/hyperledger/fabric-ca-client/crypto-config/peerOrganizations
 
